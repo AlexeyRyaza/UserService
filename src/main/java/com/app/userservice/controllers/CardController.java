@@ -1,46 +1,52 @@
 package com.app.userservice.controllers;
 
 import com.app.userservice.services.CardService;
-import com.app.userservice.services.dto.CardInfoDto;
+import com.app.userservice.services.dto.cardInfo.CardInfoCreateDto;
+import com.app.userservice.services.dto.cardInfo.CardInfoDto;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/cards")
+@RequestMapping("/api/cards")
 public class CardController {
     private final CardService cardService;
-    
+
     @Autowired
     public CardController(CardService cardService) {
         this.cardService = cardService;
     }
 
-    @PostMapping("/create")
-    ResponseEntity<CompletableFuture<CardInfoDto>> createCard(@RequestBody CardInfoDto userDto) {
-        return ResponseEntity.ok().body(cardService.createCard(userDto));
+    @PostMapping("/")
+    public ResponseEntity<CardInfoDto> createCard(@RequestBody @Valid CardInfoCreateDto userDto) {
+        CardInfoDto createdCard = cardService.createCard(userDto);
+        return ResponseEntity.ok(createdCard);
     }
 
-    @RequestMapping("/get/{id}")
-    ResponseEntity<CompletableFuture<CardInfoDto>> getCard(@PathVariable int id) {
-        return ResponseEntity.ok().body(cardService.findById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<CardInfoDto> getCard(@PathVariable int id) {
+        CardInfoDto card = cardService.findById(id);
+        return ResponseEntity.ok(card);
     }
 
-    @RequestMapping("/get")
-    ResponseEntity<CompletableFuture<List<CardInfoDto>>> getCards(@RequestBody List<Integer> ids) {
-        return ResponseEntity.ok().body(cardService.findCardsByIds(ids));
+    @GetMapping("/")
+    public ResponseEntity<List<CardInfoDto>> getCards(@RequestParam List<Integer> ids) {
+        List<CardInfoDto> cards = cardService.findCardsByIds(ids);
+        return ResponseEntity.ok(cards);
     }
 
-    @PutMapping("/update/{id}")
-    ResponseEntity<CompletableFuture<CardInfoDto>> updateCard(@PathVariable int id, @RequestBody CardInfoDto userDto) {
-        return ResponseEntity.ok().body(cardService.updateCard(id, userDto));
+    @PutMapping("/{id}")
+    public ResponseEntity<CardInfoDto> updateCard(@PathVariable int id, @RequestBody @Valid CardInfoDto userDto) {
+        CardInfoDto updatedCard = cardService.updateCard(id, userDto);
+        return ResponseEntity.ok(updatedCard);
     }
 
-    @DeleteMapping("/delete/{id}")
-    ResponseEntity<CompletableFuture<Void>> deleteCard(@PathVariable int id) {
-        return ResponseEntity.ok().body(cardService.deleteCardById(id));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCard(@PathVariable int id) {
+        cardService.deleteCardById(id);
+        return ResponseEntity.ok().build();
     }
 }

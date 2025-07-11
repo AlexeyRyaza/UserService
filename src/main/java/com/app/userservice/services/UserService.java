@@ -39,7 +39,7 @@ public class UserService {
 
     public UserDto findById(int id) {
         User user = userRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("User with ID " + id + " not found"));
+                () -> new UserNotFoundException(id));
 
         return userMapper.toDto(user);
     }
@@ -82,5 +82,10 @@ public class UserService {
 
     public boolean existsById(int id) {
         return userRepository.existsById(id);
+    }
+
+    public User findUserById(int id) {
+        return userRepository.findById(id).
+                orElseThrow(() -> new UserNotFoundException(id));
     }
 }

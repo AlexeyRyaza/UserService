@@ -1,13 +1,14 @@
 package com.app.userservice.services;
 
 import com.app.userservice.exceptions.card.CardNotFoundException;
+import com.app.userservice.exceptions.user.UserNotFoundException;
 import com.app.userservice.models.CardInfo;
+import com.app.userservice.models.User;
 import com.app.userservice.repos.CardRepository;
 import com.app.userservice.services.dto.cardInfo.CardInfoCreateDto;
 import com.app.userservice.services.dto.cardInfo.CardInfoDto;
-import com.app.userservice.services.dto.user.UserDto;
 import com.app.userservice.services.mapper.CardInfoMapper;
-import jakarta.persistence.EntityNotFoundException;
+import com.app.userservice.services.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,22 +32,20 @@ public class CardService {
     @Transactional
     public CardInfoDto createCard(CardInfoCreateDto cardCreateDto) {
         if (!userService.existsById(cardCreateDto.getUserId())) {
-            throw new EntityNotFoundException("User with id " + cardCreateDto.getUserId() + " not found");
+            throw new UserNotFoundException(cardCreateDto.getUserId());
         }
 
         CardInfo card = cardMapper.toEntity(cardCreateDto);
+        User user = userService.findUserById(cardCreateDto.getUserId());
+        card.setUser(user);
+
         card = cardRepository.save(card);
-
-        UserDto userDto = userService.findById(cardCreateDto.getUserId());
-        userDto.getCards().add(cardMapper.toDto(card));
-        userService.updateUser(userDto.getId(), userDto);
-
         return cardMapper.toDto(card);
     }
 
     public CardInfoDto findById(int id) {
         CardInfo card = cardRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Card with ID " + id + " not found"));
+                () -> new CardNotFoundException(id));
 
         return cardMapper.toDto(card);
     }
