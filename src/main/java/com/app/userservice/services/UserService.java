@@ -1,14 +1,18 @@
 package com.app.userservice.services;
 
+import com.app.userservice.exceptions.general.DuplicateException;
+import com.app.userservice.exceptions.user.UserNotFoundException;
 import com.app.userservice.models.User;
 import com.app.userservice.repos.UserRepository;
-import com.app.userservice.services.dto.UserDto;
+import com.app.userservice.services.dto.user.UserCreateDto;
+import com.app.userservice.services.dto.user.UserDto;
 import com.app.userservice.services.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -25,7 +29,11 @@ public class UserService {
     }
 
     @Transactional
-    public CompletableFuture<UserDto> createUser(UserDto userDto) {
+    public CompletableFuture<UserDto> createUser(UserCreateDto userDto) {
+        if(userRepository.existsByEmail(userDto.getEmail())){
+            throw new DuplicateException("User with email: " + userDto.getEmail() + " already exists");
+        }
+
         User user = userMapper.toEntity(userDto);
         user = userRepository.save(user);
         return CompletableFuture.completedFuture(userMapper.toDto(user));
@@ -39,10 +47,15 @@ public class UserService {
     }
 
     public CompletableFuture<List<UserDto>> findUsersByIds(List<Integer> ids) {
+        if(ids.isEmpty()){
+            throw new IllegalArgumentException("Ids cannot be empty");
+        }
+
         List<User> users = userRepository.findAllById(ids);
         List<UserDto> dtos = users.stream()
                 .map(userMapper::toDto)
                 .collect(Collectors.toList());
+
         return CompletableFuture.completedFuture(dtos);
     }
 
@@ -54,19 +67,20 @@ public class UserService {
 
     @Transactional
     public CompletableFuture<UserDto> updateUser(int id, UserDto updatedDto) {
-        User user = userRepository.findById(id).orElseThrow();
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        user.setName(updatedDto.getName());
-        user.setSurname(updatedDto.getSurname());
-        user.setBirthday(updatedDto.getBirthDate());
-        user.setEmail(updatedDto.getEmail());
+        userMapper.updateEntityFromDto(updatedDto, existingUser);
 
-        user = userRepository.save(user);
-        return CompletableFuture.completedFuture(userMapper.toDto(user));
+        return CompletableFuture.completedFuture(userMapper.toDto(existingUser));
     }
 
     @Transactional
     public CompletableFuture<Void> deleteUserById(int id) {
+        if(!userRepository.existsById(id)){
+            throw new UserNotFoundException(id);
+        }
+
         userRepository.deleteById(id);
         return CompletableFuture.completedFuture(null);
     }

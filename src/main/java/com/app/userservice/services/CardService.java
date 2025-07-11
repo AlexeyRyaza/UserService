@@ -1,9 +1,11 @@
 package com.app.userservice.services;
 
+import com.app.userservice.exceptions.card.CardNotFoundException;
 import com.app.userservice.models.CardInfo;
 import com.app.userservice.repos.CardRepository;
-import com.app.userservice.services.dto.CardInfoDto;
-import com.app.userservice.services.mapper.CardMapper;
+import com.app.userservice.services.dto.cardInfo.CardInfoCreateDto;
+import com.app.userservice.services.dto.cardInfo.CardInfoDto;
+import com.app.userservice.services.mapper.CardInfoMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,17 @@ import java.util.stream.Collectors;
 @Service
 public class CardService {
     private final CardRepository cardRepository;
-    private final CardMapper cardMapper;
+    private final CardInfoMapper cardMapper;
 
     @Autowired
-    public CardService(CardRepository cardRepository, CardMapper cardMapper) {
+    public CardService(CardRepository cardRepository, CardInfoMapper cardMapper) {
         this.cardRepository = cardRepository;
         this.cardMapper = cardMapper;
     }
 
     @Transactional
-    public CompletableFuture<CardInfoDto> createCard(CardInfoDto cardDto) {
-        CardInfo card = cardMapper.toEntity(cardDto);
+    public CompletableFuture<CardInfoDto> createCard(CardInfoCreateDto cardCreateDto) {
+        CardInfo card = cardMapper.toEntity(cardCreateDto);
         card = cardRepository.save(card);
         return CompletableFuture.completedFuture(cardMapper.toDto(card));
     }
@@ -39,6 +41,10 @@ public class CardService {
     }
 
     public CompletableFuture<List<CardInfoDto>> findCardsByIds(List<Integer> ids) {
+        if(ids.isEmpty()) {
+            throw new IllegalArgumentException("Ids cannot be empty");
+        }
+
         List<CardInfo> cards = cardRepository.findAllById(ids);
         List<CardInfoDto> dtos = cards.stream()
                 .map(cardMapper::toDto)
@@ -49,18 +55,20 @@ public class CardService {
 
     @Transactional
     public CompletableFuture<CardInfoDto> updateCard(int id, CardInfoDto updatedDto) {
-        CardInfo card = cardRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Card with ID " + id + " not found"));
+        CardInfo existingCard = cardRepository.findById(id)
+                .orElseThrow(() -> new CardNotFoundException(id));
 
-        card.setNumber(updatedDto.getNumber());
-        card.setHolder(updatedDto.getHolder());
-        card.setExpirationDate(updatedDto.getExpirationDate());
-        card = cardRepository.save(card);
-        return CompletableFuture.completedFuture(cardMapper.toDto(card));
+        cardMapper.updateEntityFromDto(updatedDto, existingCard);
+
+        return CompletableFuture.completedFuture(cardMapper.toDto(existingCard));
     }
 
     @Transactional
     public CompletableFuture<Void> deleteCardById(int id) {
+        if(!cardRepository.existsById(id)) {
+            throw new CardNotFoundException(id);
+        }
+
         cardRepository.deleteById(id);
         return CompletableFuture.completedFuture(null);
     }
