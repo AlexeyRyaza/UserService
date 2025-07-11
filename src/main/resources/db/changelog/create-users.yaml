@@ -33,3 +33,15 @@ databaseChangeLog:
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
+
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: email
+            constraintName: uc_us_email
+
+        - createIndex:
+            indexName: idx_users_email
+            tableName: users
+            columns:
+              - column:
+                  name: email
