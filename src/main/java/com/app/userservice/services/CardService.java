@@ -25,7 +25,8 @@ public class CardService {
     private final CardCacheService cardCacheService;
 
     @Autowired
-    public CardService(CardRepository cardRepository, CardInfoMapper cardMapper, UserService userService, CardCacheService cardCacheService) {
+    public CardService(CardRepository cardRepository, CardInfoMapper cardMapper,
+                       UserService userService, CardCacheService cardCacheService) {
         this.cardRepository = cardRepository;
         this.cardMapper = cardMapper;
         this.userService = userService;
@@ -37,9 +38,9 @@ public class CardService {
         if (!userService.existsById(cardCreateDto.getUserId())) {
             throw new UserNotFoundException(cardCreateDto.getUserId());
         }
+        User user = userService.findUserById(cardCreateDto.getUserId());
 
         CardInfo card = cardMapper.toEntity(cardCreateDto);
-        User user = userService.findUserById(cardCreateDto.getUserId());
         card.setUser(user);
 
         card = cardRepository.save(card);

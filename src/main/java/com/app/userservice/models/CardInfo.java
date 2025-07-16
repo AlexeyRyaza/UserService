@@ -1,9 +1,11 @@
 package com.app.userservice.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDate;
 
@@ -25,8 +27,9 @@ public class CardInfo {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate expirationDate;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    @ToString.Exclude
     private User user;
 }

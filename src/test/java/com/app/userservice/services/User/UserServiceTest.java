@@ -1,6 +1,7 @@
 package com.app.userservice.services.User;
 
 import com.app.userservice.exceptions.general.DuplicateException;
+import com.app.userservice.exceptions.general.EntityNotFoundException;
 import com.app.userservice.exceptions.user.UserNotFoundException;
 import com.app.userservice.models.User;
 import com.app.userservice.repos.UserRepository;
@@ -9,7 +10,6 @@ import com.app.userservice.services.cache.interfaces.UserCacheService;
 import com.app.userservice.services.dto.user.UserCreateDto;
 import com.app.userservice.services.dto.user.UserDto;
 import com.app.userservice.services.mapper.UserMapper;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

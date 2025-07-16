@@ -1,0 +1,25 @@
+# Maven
+target/
+*.log
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Git
+.git/
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.class
+*.jar
+*.war
+*.zip
+*.pem
+*.env

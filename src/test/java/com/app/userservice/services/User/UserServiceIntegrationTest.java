@@ -113,7 +113,7 @@ class UserServiceIntegrationTest {
         userService.deleteUserById(created.getId());
 
         org.junit.jupiter.api.Assertions.assertThrows(
-                jakarta.persistence.EntityNotFoundException.class,
+                com.app.userservice.exceptions.general.EntityNotFoundException.class,
                 () -> userService.findById(created.getId())
         );
     }

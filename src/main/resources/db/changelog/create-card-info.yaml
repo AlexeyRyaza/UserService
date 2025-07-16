@@ -20,6 +20,8 @@ databaseChangeLog:
               - column:
                   name: number
                   type: VARCHAR(20)
+                  constraints:
+                    nullable: false
               - column:
                   name: holder
                   type: VARCHAR(255)
@@ -33,3 +35,10 @@ databaseChangeLog:
             referencedTableName: users
             referencedColumnNames: id
             constraintName: fk_card_user
+
+        - createIndex:
+            indexName: idx_card_info_user_id
+            tableName: card_info
+            columns:
+              - column:
+                  name: user_id

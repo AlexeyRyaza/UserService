@@ -135,7 +135,7 @@ class CardServiceIntegrationTest {
 
         cardService.deleteCardById(created.getId());
 
-        assertThrows(CardNotFoundException.class, () -> cardService.findById(created.getId()));
+        assertThrows(com.app.userservice.exceptions.general.EntityNotFoundException.class, () -> cardService.findById(created.getId()));
     }
 
     @Test
