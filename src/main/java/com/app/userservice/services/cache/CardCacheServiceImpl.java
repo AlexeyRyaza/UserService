@@ -23,7 +23,9 @@ public class CardCacheServiceImpl implements CardCacheService {
     @Override
     public Optional<CardInfoDto> getByIdFromCache(int id) {
         Object raw = redisTemplate.opsForValue().get(CARD_KEY_PREFIX + id);
-        if (raw == null) return Optional.empty();
+        if (raw == null) {
+            return Optional.empty();
+        }
 
         CardInfoDto card = objectMapper.convertValue(raw, CardInfoDto.class);
         return Optional.of(card);

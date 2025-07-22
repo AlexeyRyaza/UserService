@@ -12,20 +12,21 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Объект ошибки, возвращаемый в случае неудачного запроса")
+@Schema(description = "Error object returned in case of a failed request")
 public class ErrorResponse {
-    @Schema(description = "HTTP статус", example = "404")
+
+    @Schema(description = "HTTP status code", example = "404")
     private int status;
 
-    @Schema(description = "Название ошибки", example = "Not Found")
+    @Schema(description = "Error title", example = "Not Found")
     private String error;
 
-    @Schema(description = "Описание ошибки", example = "User with ID 123 not found")
+    @Schema(description = "Detailed error message", example = "User with ID 123 not found")
     private String message;
 
-    @Schema(description = "Путь запроса", example = "/user/123")
+    @Schema(description = "Request path", example = "/user/123")
     private String path;
 
-    @Schema(description = "Ошибки валидации, если есть")
+    @Schema(description = "Validation errors, if any")
     private List<ValidationError> errors;
 }

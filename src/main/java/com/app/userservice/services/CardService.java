@@ -56,7 +56,6 @@ public class CardService {
     public CardInfoDto findById(int id) {
         Optional<CardInfoDto> cached = cardCacheService.getByIdFromCache(id);
         if (cached.isPresent()) {
-            System.out.println("Cache");
             return cached.get();
         }
 
