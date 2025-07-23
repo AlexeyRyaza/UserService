@@ -37,12 +37,11 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
-            -Dsonar.host.url=https://sonarcloud.io
+          projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: AlexeyRyaza_UserService
+          SONAR_ORGANIZATION: AlexeyRyaza
 
   docker-build-push:
     name: Build & Push Docker image
@@ -67,4 +66,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/your-image-name:latest
+          tags: your_dockerhub_username/your-image-name:latest
