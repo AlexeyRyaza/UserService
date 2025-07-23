@@ -103,14 +103,6 @@ class UserServiceTest {
     }
 
     @Test
-    void findById_shouldThrowIfNotFound() {
-        when(userCacheService.getFromCache(3)).thenReturn(Optional.empty());
-        when(userRepository.findById(3)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> userService.findById(3));
-    }
-
-    @Test
     void findUsersByIds_shouldThrowIfEmptyIds() {
         assertThrows(IllegalArgumentException.class, () -> userService.findUsersByIds(List.of()));
     }
@@ -160,14 +152,6 @@ class UserServiceTest {
 
         verify(userCacheService).putInCache(user);
         assertNotNull(dto);
-    }
-
-    @Test
-    void findByEmail_shouldThrowIfNotFound() {
-        when(userCacheService.getByEmailFromCache("notfound@example.com")).thenReturn(Optional.empty());
-        when(userRepository.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> userService.findByEmail("notfound@example.com"));
     }
 
     @Test

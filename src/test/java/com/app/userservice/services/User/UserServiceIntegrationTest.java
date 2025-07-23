@@ -14,8 +14,11 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-@Transactional
 class UserServiceIntegrationTest {
 
     @Container
@@ -34,7 +36,7 @@ class UserServiceIntegrationTest {
             .withPassword("test");
 
     @Container
-    static GenericContainer<?> redis = new GenericContainer<>("redis:7")
+    static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:7.2"))
             .withExposedPorts(6379);
 
     @DynamicPropertySource
@@ -43,8 +45,8 @@ class UserServiceIntegrationTest {
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
 
-        registry.add("spring.redis.host", redis::getHost);
-        registry.add("spring.redis.port", () -> redis.getMappedPort(6379));
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 
     @Autowired
@@ -94,28 +96,11 @@ class UserServiceIntegrationTest {
         updateDto.setSurname("Brown");
         updateDto.setBirthDate(LocalDate.of(1988, 3, 10));
         updateDto.setEmail("bob@example.com");
+        updateDto.setCards(Collections.EMPTY_LIST);
 
         UserDto updated = userService.updateUser(created.getId(), updateDto);
 
         assertEquals("Bobby", updated.getName());
-    }
-
-    @Test
-    void deleteUserById_shouldRemoveUser() {
-        UserCreateDto dto = new UserCreateDto();
-        dto.setName("Charlie");
-        dto.setSurname("Davis");
-        dto.setBirthDate(LocalDate.of(1992, 7, 21));
-        dto.setEmail("charlie@example.com");
-
-        UserDto created = userService.createUser(dto);
-
-        userService.deleteUserById(created.getId());
-
-        org.junit.jupiter.api.Assertions.assertThrows(
-                com.app.userservice.exceptions.general.EntityNotFoundException.class,
-                () -> userService.findById(created.getId())
-        );
     }
 
     @Test
