@@ -40,8 +40,8 @@ jobs:
           projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: AlexeyRyaza_UserService
-          SONAR_ORGANIZATION: AlexeyRyaza
+          SONAR_PROJECT_KEY:  ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION:  ${{ secrets.SONAR_ORGANIZATION }}
 
   docker-build-push:
     name: Build & Push Docker image
